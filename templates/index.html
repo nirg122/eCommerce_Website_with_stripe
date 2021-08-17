@@ -1,0 +1,65 @@
+{% include "header.html" %}
+
+<!-- Page Header -->
+<header class="masthead"
+        style="background-image: url('https://images.unsplash.com/photo-1627328561499-a3584d4ee4f7?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=3847&q=80')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1>Nir's Shop</h1>
+                    <span class="subheading">Products For Sale.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<section id="message">
+    <div class="container" style="width: 60%; margin: auto; text-align: center;">
+        <h1 style="margin: 40px 0; color:red"><strong>{{ message }}</strong></h1>
+    </div>
+    <script>$('#flashmessage').fadeOut(3000);</script>
+</section>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- Main Content -->
+
+<section id="products">
+    <div class="container">
+        <div class="row">
+            {% for product in all_products %}
+            <div class="col-lg-3 col-md-4 me-auto">
+                <form action="{{url_for('add_to_cart', product_id=product.id)}}" method="POST">
+                    <div class="card" style="width: 18rem;">
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{product.name}}</h5>
+                            {% if product.img %}
+                                <img src="{{product.img}}" class="card-img-top" alt="...">
+                            {% endif %}
+                            {% if product.description %}
+                            <p class="card-text">{{product.description}}</p>
+                            {% endif %}
+                            <p class="card-text">Price: {{ product.price }} $</p>
+                            <label>Quantity: <input value="1" min="1" type="number" name="quantity"></label>
+                            <div style="margin: auto; width: 60%; padding: 10px;">
+                                <button type="submit" name="{{product.name}}" class="btn btn-primary">Add To Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<hr>
+
+{% include "footer.html" %}

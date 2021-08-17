@@ -1,0 +1,38 @@
+{% include "header.html" %}
+
+<header class="masthead"
+        style="background-image: url('https://images.unsplash.com/photo-1470092306007-055b6797ca72?ixlib=rb-1.2.1&auto=format&fit=crop&w=668&q=80')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1>Add Product To The Shop</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container" style="margin: 1rem 0.75rem 0; border: solid #dee2e6;">
+<form action="/add-product" method="POST">
+    <div class="mb-3">
+        <label for="ProductName" class="form-label">Product Name:</label>
+        <input type="text" id="ProductName" name="product-name">
+    </div>
+    <div class="mb-3">
+        <label for="Price" class="form-label">Price:</label>
+        <input type="text" name="price" id="Price">
+    </div>
+    <div class="mb-3">
+        <label for="imageUrl" class="form-label">Image Url:</label>
+        <input type="text" name="img-url" id="imageUrl">
+    </div>
+    <div class="mb-3">
+        <label for="stripePrice" class="form-label">Stripe Price:</label>
+        <input name="stripe-price" id="stripePrice">
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+</div>
+{% include "footer.html" %}

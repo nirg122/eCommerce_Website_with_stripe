@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Nirs's Shop</title>
+
+    <!-- Bootstrap core CSS -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+            crossorigin="anonymous"></script>
+
+    <!-- Custom fonts for this template -->
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet"
+          type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+    <link href="{{url_for('static', filename='css/clean-blog.min.css')}}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/styles.css')}}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/cart.css')}}" rel="stylesheet">
+</head>
+<!--</head>-->
+<header class="masthead"
+        style="background-image: url('https://images.unsplash.com/photo-1627328561499-a3584d4ee4f7?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=3847&q=80')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1>{{current_user.name.title()}}'s Cart</h1>
+                    <span class="subheading">This Is Your Lovely Cart.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-md navbar-light fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="{{url_for('home')}}">Nir's Shop</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                </li>
+                {% if not current_user.is_authenticated: %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                </li>
+                {% else: %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('show_cart') }}">Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                </li>
+                {% if current_user.id == 1 %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('add_product') }}">Add Product</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Cart -->
+<div class="container">
+    <div class="contentbar">
+        <!-- Start row -->
+        <div class="row">
+            <!-- Start col -->
+            <div class="col-md-12 col-lg-12 col-xl-12">
+                <div class="card m-b-30">
+                    <div class="card-header">
+                        <h5 class="card-title" id="cart">Cart</h5>
+                    </div>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div id="message">
+                        <div class="container" style="width: 60%; margin: auto; text-align: center; color: red">
+                            <p><strong>{{ message }}</strong></p>
+                        </div>
+                        <script>$('#flashmessage').fadeOut(3000);</script>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-10 col-xl-8">
+                                <div class="cart-container">
+                                    <div class="cart-head">
+                                        <div class="table-responsive">
+                                            <form id="update-qty" method="POST">
+                                                <table class="table table-borderless">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Action</th>
+                                                        <th scope="col">Photo</th>
+                                                        <th scope="col">Product</th>
+                                                        <th scope="col">Qty</th>
+                                                        <th scope="col">Price</th>
+                                                        <th scope="col" class="text-right">Total</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    {% for product in products_in_cart %}
+                                                    <tr>
+                                                        <th scope="row">{{ products_in_cart.index(product) + 1}}</th>
+                                                        <td>
+                                                            <form method="POST"
+                                                                  action="{{url_for('delete_from_cart', item_id=product.id)}}">
+                                                                <button type="submit" class="text-danger delete-button">
+                                                                    <i
+                                                                            class="ri-delete-bin-3-line"></i></button>
+                                                            </form>
+                                                        </td>
+                                                        <td><img
+                                                                src="{{product.products.img}}"
+                                                                class="img-fluid" width="35" alt="product"></td>
+                                                        <td>{{ product.products.name }}</td>
+                                                        <td>
+                                                            <div class="form-group mb-0">
+                                                                <input type="number" name="cartQty{{product.id}}"
+                                                                       class="form-control cart-qty"
+                                                                       value="{{product.quantity}}"
+                                                                       min="1">
+                                                            </div>
+                                                        </td>
+                                                        <td>${{product.products.price}}</td>
+                                                        <td class="text-right">${{ product.products.price *
+                                                            product.quantity}}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="cart-body">
+                                        <div class="row">
+                                            <div class="col-md-12 order-2 order-lg-1 col-lg-5 col-xl-6">
+                                                <div class="order-note">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="specialNotes">Special Note for this
+                                                                order:</label>
+                                                            <textarea class="form-control" name="specialNotes"
+                                                                      id="specialNotes" rows="3"
+                                                                      placeholder="Message here"></textarea>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 order-1 order-lg-2 col-lg-7 col-xl-6">
+                                                <div class="order-total table-responsive ">
+                                                    <table class="table table-borderless text-right">
+                                                        <tbody>
+                                                        <br><br><br><br><br>
+                                                        <tr>
+                                                            <td class="f-w-7 font-18"><h4>Amount :</h4></td>
+                                                            <td class="f-w-7 font-18"><h4>${{'%0.2f' % sum_amount|float }}</h4></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="cart-footer text-right">
+                                        <button form="update-qty" formmethod="POST"
+                                                formaction="{{url_for('update_qty_from_cart')}}" type="submit"
+                                                class="btn btn-info my-1">
+                                            <i
+                                                    class="ri-save-line mr-2"></i>Update Cart
+                                        </button>
+                                        <a href="/create-checkout-session" class="btn btn-success my-1">Proceed to
+                                            Checkout<i
+                                                    class="ri-arrow-right-line ml-2"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End col -->
+        </div>
+        <!-- End row -->
+    </div>
+</div>
+
+
+{% include "footer.html" %}
