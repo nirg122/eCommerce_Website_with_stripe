@@ -1,15 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
-from datetime import date
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import LoginForm, RegisterForm, CreatePostForm, CommentForm
-from flask_gravatar import Gravatar
-import json
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
+from forms import LoginForm, RegisterForm
 import os
 import stripe
 
@@ -21,8 +18,6 @@ app = Flask(__name__, instance_path='/instance')
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap(app)
-gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False,
-                    base_url=None)
 
 # CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///eCommerce.db'
@@ -193,19 +188,29 @@ def add_to_cart(product_id):
             else:
                 flash("Product is already in cart with the same quantity.")
                 return redirect("/#message")
-        # except Exception as e:
-        #     return str(e)
 
 
 @app.route('/delete-from-cart/<int:item_id>', methods=["POST"])
+@login_required
 def delete_from_cart(item_id):
-    item_to_delete = ProductsInCart.query.get(item_id)
-    db.session.delete(item_to_delete)
-    db.session.commit()
-    return redirect('/cart#cart')
+    if request.method == 'POST':
+        try:
+            item_to_delete = ProductsInCart.query.get(item_id)
+            db.session.delete(item_to_delete)
+            db.session.commit()
+
+        except Exception as e:
+            return str(e)
+        print(len(ProductsInCart.query.filter_by(cart_id=current_user.user_cart.id).all()))
+        if len(ProductsInCart.query.filter_by(cart_id=current_user.user_cart.id).all()) == 0:
+            flash('No Products In Cart')
+            return redirect('/')
+        else:
+            return redirect('/cart#cart')
 
 
 @app.route('/update-qty-from-cart', methods=["POST"])
+@login_required
 def update_qty_from_cart():
     if request.method == 'POST':
         form_args_list = request.form
@@ -229,8 +234,8 @@ def update_qty_from_cart():
             flash('No Changes Has Been Made.')
             return redirect('/cart#cart')
 
-
 @app.route(f"/cart", methods=["GET"])
+@login_required
 def show_cart():
     if request.method == 'GET':
         users_cart = Cart.query.filter_by(user_id=current_user.id).first()

@@ -148,11 +148,11 @@
                                                     <tr>
                                                         <th scope="row">{{ products_in_cart.index(product) + 1}}</th>
                                                         <td>
-                                                            <form method="POST"
-                                                                  action="{{url_for('delete_from_cart', item_id=product.id)}}">
-                                                                <button type="submit" class="text-danger delete-button">
-                                                                    <i
-                                                                            class="ri-delete-bin-3-line"></i></button>
+                                                            <form id="delete-item" >
+                                                                <button formaction="{{url_for('delete_from_cart', item_id=product.id)}}"
+                                                                  formmethod="post" type="submit" class="text-danger delete-button">
+                                                                    <i class="ri-delete-bin-3-line"></i>
+                                                                </button>
                                                             </form>
                                                         </td>
                                                         <td><img
@@ -206,7 +206,8 @@
                                                         <br><br><br><br><br>
                                                         <tr>
                                                             <td class="f-w-7 font-18"><h4>Amount :</h4></td>
-                                                            <td class="f-w-7 font-18"><h4>${{'%0.2f' % sum_amount|float }}</h4></td>
+                                                            <td class="f-w-7 font-18"><h4>${{'%0.2f' % sum_amount|float
+                                                                }}</h4></td>
                                                         </tr>
                                                         </tbody>
                                                     </table>
